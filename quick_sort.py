@@ -19,7 +19,7 @@ def quicksort(data):
     right = [x for x in data if x[0] > pivot[0]]
     return quicksort(left) + middle + quicksort(right)
 
-csv_list = from_csv_file('data.csv')
+csv_list = from_csv_file('shuffled_data.csv')
 header, data = csv_list[0], csv_list[1:]
 sorted_data = quicksort(data)
 sorted_csv = to_csv_string([header] + sorted_data)
