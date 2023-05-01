@@ -1,27 +1,43 @@
-def from_csv_file(file_path):
-    with open(file_path, 'r') as file:
-        content = file.read()
-    return from_csv_string(content)
+import csv
 
-def from_csv_string(csv_string):
-    lines = csv_string.strip().split('\n')
-    return [line.split(',') for line in lines]
 
-def to_csv_string(data):
-    return '\n'.join([','.join(row) for row in data])
+# Função de partição para o quicksort
+def partition(data, low, high):
+    pivot = data[high]
+    i = low - 1
+    for j in range(low, high):
+        if data[j][0] <= pivot[0]:
+            i += 1
+            data[i], data[j] = data[j], data[i]
+    data[i + 1], data[high] = data[high], data[i + 1]
+    return i + 1
 
-def quicksort(data):
-    if len(data) <= 1:
-        return data
-    pivot = data[len(data) // 2]
-    left = [x for x in data if x[0] < pivot[0]]
-    middle = [x for x in data if x[0] == pivot[0]]
-    right = [x for x in data if x[0] > pivot[0]]
-    return quicksort(left) + middle + quicksort(right)
 
-csv_list = from_csv_file('shuffled_data.csv')
-header, data = csv_list[0], csv_list[1:]
-sorted_data = quicksort(data)
-sorted_csv = to_csv_string([header] + sorted_data)
+# Algoritmo quicksort
+def quicksort(data, low, high):
+    if low < high:
+        pi = partition(data, low, high)
+        quicksort(data, low, pi - 1)
+        quicksort(data, pi + 1, high)
 
-print(sorted_csv)
+
+# Leitura do arquivo CSV
+filename = "shuffled_data.csv"
+rows = []
+
+with open(filename, "r") as csvfile:
+    csvreader = csv.reader(csvfile)
+    header = next(csvreader)
+
+    for row in csvreader:
+        row[0] = int(row[0])
+        rows.append(row)
+
+# Ordenação usando quicksort
+quicksort(rows, 0, len(rows) - 1)
+
+# Salvar arquivo CSV ordenado
+with open("sorted_data.csv", "w", newline="") as csvfile:
+    csvwriter = csv.writer(csvfile)
+    csvwriter.writerow(header)
+    csvwriter.writerows(rows)
