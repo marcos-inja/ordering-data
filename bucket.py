@@ -1,33 +1,33 @@
 import csv
 
-def bucket_sort(arr):
-    min_id = min(arr)
-    max_id = max(arr)
-    bucket_count = max_id - min_id + 1
-    buckets = [[] for _ in range(bucket_count)]
+def bucket_sort(file_path):
+    # Leitura do arquivo CSV
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file)
+        header = next(reader) # armazena o cabeçalho
+        rows = [row for row in reader] # armazena as linhas como uma lista de listas
 
-    for i in arr:
-        idx = i - min_id
-        buckets[idx].append(i)
+    # Criação dos buckets vazios
+    num_buckets = 10 # número de buckets
+    buckets = [[] for _ in range(num_buckets)]
 
-    sorted_arr = []
-    for bucket in buckets:
-        if bucket:
-            sorted_arr.extend(bucket)
-
-    return sorted_arr
-
-filename = 'shuffled_data.csv'
-
-with open(filename, newline='', encoding='utf-8') as csvfile:
-    csv_reader = csv.reader(csvfile)
-    header = next(csv_reader)
-    rows = [row for row in csv_reader]
-
-rows.sort(key=lambda x: int(x[0]))  # Ordena por ID
-
-with open('sorted_data.csv', 'w', newline='', encoding='utf-8') as csvfile:
-    csv_writer = csv.writer(csvfile)
-    csv_writer.writerow(header)
+    # Adiciona cada linha ao bucket correspondente
     for row in rows:
-        csv_writer.writerow(row)
+        bucket_index = int(row[0]) % num_buckets # calcula o índice do bucket
+        buckets[bucket_index].append(row)
+
+    # Ordena cada bucket individualmente usando o método de ordenação de sua escolha
+    for i in range(num_buckets):
+        buckets[i].sort(key=lambda row: int(row[0])) # ordena pelo valor da coluna id convertido para inteiro
+
+    # Concatena os buckets ordenados em uma única lista de linhas ordenadas
+    sorted_rows = [row for bucket in buckets for row in bucket]
+
+    # Escrita do arquivo CSV ordenado
+    with open('sorted_data.csv', 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        writer.writerows(sorted_rows)
+
+
+bucket_sort('shuffled_data.csv')
